@@ -4,6 +4,7 @@ import { Player } from "../types";
 
 export default function Rankings() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(false);
   const BACKEND_URL = "https://xadrezranking-srv-production.up.railway.app";
 
   // Busca os jogadores no backend
@@ -11,14 +12,36 @@ export default function Rankings() {
     try {
       const res = await fetch(`${BACKEND_URL}/players`);
       const data = await res.json();
-  
-      // Ordenar os jogadores pelo ranking (pontos)
+
       const sortedPlayers = data.sort((a: Player, b: Player) => b.points - a.points);
       setPlayers(sortedPlayers);
     } catch (error) {
       console.error("Erro ao buscar jogadores:", error);
     }
   };
+
+  // Função para resetar os pontos
+  const resetPoints = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/players/reset`, {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        alert("Pontos resetados com sucesso!");
+        fetchPlayers(); // Atualiza a lista
+      } else {
+        alert("Erro ao resetar os pontos.");
+      }
+    } catch (error) {
+      console.error("Erro ao resetar pontos:", error);
+      alert("Ocorreu um erro. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchPlayers();
   }, []);
@@ -38,19 +61,15 @@ export default function Rankings() {
             key={player.id}
             className="flex flex-col items-center bg-gray-700 rounded-lg shadow-lg p-6 w-48 md:w-56"
           >
-            {/* Ícones para os 3 primeiros colocados */}
             {index === 0 && <Trophy className="h-12 w-12 text-yellow-400 mb-2" />}
             {index === 1 && <Medal className="h-12 w-12 text-gray-300 mb-2" />}
             {index === 2 && <Medal className="h-12 w-12 text-amber-600 mb-2" />}
 
-            {/* Imagem do Jogador */}
             <img
               src={player.profileImage || "/placeholder.png"}
               alt={player.username}
               className="h-16 w-16 rounded-full object-cover border-2 border-gray-500 mb-2"
             />
-
-            {/* Nome e Pontuação */}
             <h3 className="text-lg md:text-xl font-semibold text-white">{player.username}</h3>
             <p className="text-lg md:text-2xl text-blue-400 font-bold">
               Pontos: {player.points.toFixed(1)}
@@ -67,12 +86,9 @@ export default function Rankings() {
               key={player.id}
               className="flex items-center space-x-4 p-4 md:p-6 bg-gray-700 rounded-lg shadow hover:shadow-xl transition"
             >
-              {/* Rank */}
               <div className="flex-shrink-0 text-center w-12">
                 <span className="text-xl md:text-2xl font-semibold text-gray-400">{index + 4}</span>
               </div>
-
-              {/* Player Info */}
               <div className="flex-shrink-0">
                 <img
                   src={player.profileImage || "/placeholder.png"}

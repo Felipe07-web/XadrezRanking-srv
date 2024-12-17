@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
-const PlayerSchema = new mongoose.Schema({
+const playerSchema = new mongoose.Schema({
   username: { type: String, required: true },
-  id: { type: String, required: true, unique: true },
-  profileImage: { type: String, default: '' },
   points: { type: Number, default: 0 },
-  rank: { type: Number, default: 0 },
+  profileImage: { type: String },
 });
 
-export default mongoose.model('Player', PlayerSchema);
+const Player = mongoose.model('Player', playerSchema);
+
+export default Player;
