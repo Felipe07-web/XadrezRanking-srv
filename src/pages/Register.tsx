@@ -7,7 +7,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
-  const BACKEND_URL = "https://xadrezranking-srv-production.up.railway.app";
+  const BACKEND_URL = "https://xadrezranking-srv-production.up.railway.app/players";
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
