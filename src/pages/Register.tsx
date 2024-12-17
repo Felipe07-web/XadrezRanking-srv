@@ -7,7 +7,6 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
-  const BACKEND_URL = "https://xadrezranking-srv-production.up.railway.app/players";
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,7 +34,7 @@ export default function Register() {
 
     try {
       // Envia o jogador para o servidor JSON hospedado no Render
-      await fetch(`${BACKEND_URL}/players`, {
+      await fetch('http://localhost:8080/players', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
