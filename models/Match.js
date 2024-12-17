@@ -1,15 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-// Definição do esquema para partidas
-const MatchSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  round: { type: String, required: true },
-  player1Id: { type: String, required: false },
-  player2Id: { type: String, required: false },
-  winnerId: { type: String, required: false },
+const matchSchema = new mongoose.Schema({
+  player1: { type: mongoose.Schema.Types.ObjectId, ref: "Player", required: true },
+  player2: { type: mongoose.Schema.Types.ObjectId, ref: "Player", required: true },
+  result: { type: String, enum: ["win", "draw"], default: null },
+  winner: { type: mongoose.Schema.Types.ObjectId, ref: "Player", default: null },
+  round: { type: Number, default: 1 }
 });
 
-// Criação do modelo Match
-const Match = mongoose.model('Match', MatchSchema);
-
+const Match = mongoose.model("Match", matchSchema);
 export default Match;

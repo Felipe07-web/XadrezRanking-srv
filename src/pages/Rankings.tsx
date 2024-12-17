@@ -70,6 +70,7 @@ export default function Rankings() {
               alt={player.username}
               className="h-16 w-16 rounded-full object-cover border-2 border-gray-500 mb-2"
             />
+            
             <h3 className="text-lg md:text-xl font-semibold text-white">{player.username}</h3>
             <p className="text-lg md:text-2xl text-blue-400 font-bold">
               Pontos: {player.points.toFixed(1)}

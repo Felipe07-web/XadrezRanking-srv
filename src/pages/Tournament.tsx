@@ -8,6 +8,7 @@ export default function Tournament() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedWinner, setSelectedWinner] = useState<{ matchId: string; winnerId: string } | null>(null);
   const [tournamentWinner, setTournamentWinner] = useState<Player | null>(null);
+  
 
   // Função para buscar jogadores do backend
   useEffect(() => {
@@ -111,7 +112,25 @@ export default function Tournament() {
   // Confirma o vencedor de uma partida e atualiza os pontos
   const confirmWinner = async (matchId: string, winnerId: string, increment: number) => {
     try {
-      // Atualiza os pontos do jogador vencedor
+      const currentMatch = matches.find((match) => match.id === matchId);
+  
+      // 1. Caso de empate - adiciona 0.5 ponto, mas não avança jogadores
+      if (increment === 0.5) {
+        console.log(`🤝 Empate na partida ${matchId}. Adicionando 0.5 ponto.`);
+        
+        // Atualiza os pontos do jogador empatado
+        await fetch(`${BACKEND_URL}/players/${winnerId}/points`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ increment }),
+        });
+  
+        alert("Repetir partida para proseguir , pontos atualizados com sucesso no ranking geral");
+        return; // Não avança para a próxima chave
+      }
+  
+      // 2. Vitória - adiciona pontos e avança o jogador
+      console.log(`🏆 Vitória do jogador ${winnerId}. Avançando para próxima fase.`);
       await fetch(`${BACKEND_URL}/players/${winnerId}/points`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -125,22 +144,23 @@ export default function Tournament() {
       setMatches(updatedMatches);
       saveMatches(updatedMatches);
   
-      // Verifica se a partida atual é a "finals" e define o campeão
-      const currentMatch = matches.find((match) => match.id === matchId);
-      if (currentMatch?.round === "finals") {
-        const champion = players.find((player) => player.id === winnerId);
-        setTournamentWinner(champion || null);
-      } else {
-        // Verifica se há uma próxima partida
+      // Atualiza a próxima partida (exceto na final)
+      if (currentMatch?.round !== "finals") {
         const nextMatch = getNextMatch(currentMatch!);
         if (nextMatch) updateNextMatch(nextMatch, winnerId);
+      } else {
+        // Define o vencedor do torneio
+        const champion = players.find((player) => player.id === winnerId);
+        setTournamentWinner(champion || null);
       }
   
-      setSelectedWinner(null); // Limpa a seleção
+      setSelectedWinner(null);
     } catch (error) {
       console.error("Erro ao confirmar o vencedor:", error);
     }
   };
+  
+  
   
 
   const getNextMatch = (currentMatch: Match) => {
